@@ -11,6 +11,7 @@ Game::Game()
 	, mTexture()
 	, mPlayer()
 	, _Ground()
+	, _Scale()
 	, mIsMovingRight(false)
 	, mIsMovingLeft(false)
 {
@@ -18,6 +19,7 @@ Game::Game()
 
 	mTexture.loadFromFile("Media/Textures/Mario1.png");
 	_TextureGround.loadFromFile("Media/Textures/Block.png");
+	_TextureScale.loadFromFile("Media/Textures/Echelle.png");
 
 	InitSprites();
 }
@@ -53,14 +55,38 @@ void Game::InitSprites()
 	//
 	for (int i = 0; i < 9; i++) {
 		_Ground[i].setTexture(_TextureGround);
-		_Ground[i].setPosition(100.f + 68.f * i, 300);
+		_Ground[i].setPosition(100.f + 68.f * i, 300.f);
 		std::shared_ptr<Entity> ground = std::make_shared<Entity>();
 		ground->m_sprite = _Ground[i];
 		ground->m_type = EntityType::ground;
-		ground->m_size = mTexture.getSize();
+		ground->m_size = _TextureGround.getSize();
 		ground->m_position = _Ground[0].getPosition();
 		EntityManager::m_Entities.push_back(ground);
 	}
+
+	for (int i = 0; i < 3; i++) {
+		_Ground[i].setTexture(_TextureGround);
+		_Ground[i].setPosition(240.f + 68.f * i, 195.f);
+		std::shared_ptr<Entity> ground = std::make_shared<Entity>();
+		ground->m_sprite = _Ground[i];
+		ground->m_type = EntityType::ground;
+		ground->m_size = _TextureGround.getSize();
+		ground->m_position = _Ground[0].getPosition();
+		EntityManager::m_Entities.push_back(ground);
+	}
+
+	//
+	// Scale
+	//
+
+	_Scale.setTexture(_TextureScale);
+	_Scale.setPosition(200.f, 195.f);
+	std::shared_ptr<Entity> scale = std::make_shared<Entity>();
+	scale->m_sprite = _Scale;
+	scale->m_type = EntityType::scale;
+	scale->m_size = _TextureScale.getSize();
+	scale->m_position = _Scale.getPosition();
+	EntityManager::m_Entities.push_back(scale);
 
 }
 
@@ -171,14 +197,14 @@ void Game::render()
 		}
 		
 		if (entity->m_type == EntityType::ground)
-			if (entity->m_sprite.getGlobalBounds().intersects(EntityManager::m_Entities.at(0)->m_sprite.getGlobalBounds()))
+			if (entity->m_sprite.getGlobalBounds().intersects(EntityManager::GetPlayer()->m_sprite.getGlobalBounds()))
 				cpt+=1;
 
 		mWindow.draw(entity->m_sprite);
 	}
 
-	if (cpt == 0)
-		EntityManager::m_Entities.at(0)->m_sprite.move(sf::Vector2f(0, 2));
+	if (cpt == 0 && !EntityManager::GetScale()->m_sprite.getGlobalBounds().intersects(EntityManager::GetPlayer()->m_sprite.getGlobalBounds()))
+		EntityManager::GetPlayer()->m_sprite.move(sf::Vector2f(0, 2));
 
 	mWindow.draw(mText);
 	mWindow.display();
@@ -190,4 +216,11 @@ void Game::handlePlayerInput(sf::Keyboard::Key key, bool isPressed)
 		mIsMovingLeft = isPressed;
 	else if (key == sf::Keyboard::Right)
 		mIsMovingRight = isPressed;
+
+	if (key == sf::Keyboard::Up)
+		if (EntityManager::GetScale()->m_sprite.getGlobalBounds().intersects(EntityManager::GetPlayer()->m_sprite.getGlobalBounds()))
+			EntityManager::GetPlayer()->m_sprite.move(sf::Vector2f(0, -2));
+	if (key == sf::Keyboard::Down)
+		if (EntityManager::GetScale()->m_sprite.getGlobalBounds().intersects(EntityManager::GetPlayer()->m_sprite.getGlobalBounds()))
+			EntityManager::GetPlayer()->m_sprite.move(sf::Vector2f(0, 2));
 }

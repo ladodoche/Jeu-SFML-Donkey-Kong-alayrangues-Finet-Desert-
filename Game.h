@@ -1,7 +1,7 @@
 #pragma once
 #include "Weapon.h"
 
-#define GROUND_COUNT 10
+#define GROUND_COUNT 12
 
 class Game
 {
@@ -30,10 +30,6 @@ private:
 
 	std::size_t	mStatisticsNumFrames;
 
-	//-- Ground --//
-	sf::Sprite	_Ground[GROUND_COUNT];
-	sf::Texture	_TextureGround;
-
 	//-- Player --//
 	sf::Sprite	mPlayer;
 	sf::Texture	mTexture;
@@ -42,5 +38,12 @@ private:
 	bool mIsMovingRight;
 	bool mIsMovingLeft;
 
+	//-- Ground --//
+	sf::Sprite	_Ground[GROUND_COUNT];
+	sf::Texture	_TextureGround;
+
+	//-- Scale --//
+	sf::Sprite	_Scale;
+	sf::Texture	_TextureScale;
 };
 

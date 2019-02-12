@@ -3,12 +3,8 @@
 enum EntityType
 {
 	player,
-	weapon,
-	enemyWeapon,
-	enemyMasterWeapon,
-	enemy,
-	enemyMaster,
-	ground
+	ground,
+	scale
 };
 
 class Entity
