@@ -237,6 +237,7 @@ void Game::render()
 
 		mWindow.draw(entity->m_sprite);
 	}
+	cout << cpt << "\n";
 	if (cpt == 0 && !EntityManager::GetScale()->m_sprite.getGlobalBounds().intersects(EntityManager::GetPlayer()->m_sprite.getGlobalBounds()))
 		EntityManager::GetPlayer()->m_sprite.move(sf::Vector2f(0, 2));
 

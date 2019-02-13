@@ -1,7 +1,8 @@
 #pragma once
 #include "Weapon.h"
 
-#define GROUND_COUNT 12
+#define GROUND_COUNT 17
+#define SCALE_COUNT 2
 
 class Game
 {
@@ -43,7 +44,7 @@ private:
 	sf::Texture	_TextureGround;
 
 	//-- Scale --//
-	sf::Sprite	_Scale;
+	sf::Sprite	_Scale[SCALE_COUNT];
 	sf::Texture	_TextureScale;
 };
 
