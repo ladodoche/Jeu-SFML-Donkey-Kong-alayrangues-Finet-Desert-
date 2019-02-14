@@ -80,10 +80,13 @@ bool EntityManager::GetScalesCollisionPlayer(std::string direction)
 				if (entity->m_sprite.getGlobalBounds().intersects(GetPlayer()->m_sprite.getGlobalBounds())) {
 					double XPositionScale = entity->m_sprite.getPosition().x;
 					double XPositionplayer = GetPlayer()->m_sprite.getPosition().x;
-					if (XPositionScale - 10 <= XPositionplayer && XPositionScale >= XPositionplayer)
-						return true;
-					else
+					if (XPositionScale - 10 <= XPositionplayer && XPositionScale >= XPositionplayer) {
 						cout << "1";
+						return true;
+					}
+					else {
+						cout << "2";
+					}
 				}
 			}
 		}
@@ -95,8 +98,13 @@ bool EntityManager::GetScalesCollisionPlayer(std::string direction)
 					double YPositionPlayer = GetPlayer()->m_sprite.getPosition().y - GetPlayer()->m_sprite.getGlobalBounds().height;
 					double XPositionScale = entity->m_sprite.getPosition().x;
 					double XPositionplayer = GetPlayer()->m_sprite.getPosition().x;
-					if ((YPositionScale >= YPositionPlayer + 10) && (XPositionScale - 10  <= XPositionplayer && XPositionScale >= XPositionplayer))
+					if ((YPositionScale >= YPositionPlayer + 10) && (XPositionScale - 10 <= XPositionplayer && XPositionScale >= XPositionplayer)) {
+						cout << "1";
 						return true;
+					}
+					else {
+						cout << "2";
+					}
 				}
 			}
 		}
@@ -112,7 +120,6 @@ bool EntityManager::GetScalesCollisionPlayer(std::string direction)
 				}
 			}
 		}
-		cout << "\n";
 	}
 
 	return false;

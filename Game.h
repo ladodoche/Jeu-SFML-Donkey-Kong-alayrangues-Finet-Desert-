@@ -28,6 +28,7 @@ private:
 	sf::RenderWindow		mWindow;
 	sf::Font	mFont;
 	sf::Text	mText;
+	sf::Event event;
 
 	std::size_t	mStatisticsNumFrames;
 
@@ -42,9 +43,13 @@ private:
 	//-- Ground --//
 	sf::Sprite	_Ground[GROUND_COUNT];
 	sf::Texture	_TextureGround;
+	bool TouchGround;
 
 	//-- Scale --//
 	sf::Sprite	_Scale[SCALE_COUNT];
 	sf::Texture	_TextureScale;
+
+	//-- Jump --//
+	int Jump;
 };
 
