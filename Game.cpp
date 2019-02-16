@@ -182,7 +182,7 @@ void Game::update(sf::Time elapsedTime)
 		}
 		_ChangeLeftImageMario++;
 
-		if (!EntityManager::GetScalesCollisionPlayer("left") && (EntityManager::GetGroundsCollisionPlayer() || Jump != 0))
+		if (EntityManager::GetGroundCollisionFootPlayer() || Jump != 0)
 			movement.x -= PlayerSpeed;
 	}
 	if (mIsMovingRight) {
@@ -198,7 +198,7 @@ void Game::update(sf::Time elapsedTime)
 		}
 		_ChangeRightImageMario++;
 
-		if (!EntityManager::GetScalesCollisionPlayer("right") && (EntityManager::GetGroundsCollisionPlayer() || Jump != 0) )
+		if (EntityManager::GetGroundCollisionFootPlayer() || Jump != 0)
 			movement.x += PlayerSpeed;
 
 		if (EntityManager::GetGroundsCollisionPlayer() && Jump > 0 && Jump < 45)
@@ -225,21 +225,12 @@ void Game::render()
 {
 	mWindow.clear();
 
-	int cpt = 0;
 	for (std::shared_ptr<Entity> entity : EntityManager::m_Entities)
 	{
 		if (entity->m_enabled == false)
 		{
 			continue;
 		}
-		
-		if (entity->m_type == EntityType::ground)
-			if (entity->m_sprite.getGlobalBounds().intersects(EntityManager::GetPlayer()->m_sprite.getGlobalBounds()))
-				cpt += 1;
-
-		if (entity->m_type == EntityType::scale)
-			if (entity->m_sprite.getGlobalBounds().intersects(EntityManager::GetPlayer()->m_sprite.getGlobalBounds()))
-				cpt += 1;
 
 		mWindow.draw(entity->m_sprite);
 	}
@@ -257,8 +248,7 @@ void Game::render()
 		Jump--;
 		EntityManager::GetPlayer()->m_sprite.move(sf::Vector2f(0, -1));
 	}
-	else if (cpt == 0 && !EntityManager::GetGroundsCollisionPlayer()) {
-		cout << "p";
+	else if (!EntityManager::GetScalesCollisionPlayer("a") && !EntityManager::GetGroundsCollisionPlayer()) {
 		Jump = 0;
 		TouchGround = false;
 		EntityManager::GetPlayer()->m_sprite.move(sf::Vector2f(0, 2));
@@ -273,7 +263,6 @@ void Game::render()
 
 void Game::handlePlayerInput(sf::Keyboard::Key key, bool isPressed)
 {
-	cout << "l";
 	if (key == sf::Keyboard::Left) {
 		mIsMovingLeft = isPressed;
 	}
@@ -285,7 +274,7 @@ void Game::handlePlayerInput(sf::Keyboard::Key key, bool isPressed)
 		if (EntityManager::GetScalesCollisionPlayer("top"))
 			EntityManager::GetPlayer()->m_sprite.move(sf::Vector2f(0, -2));
 	if (key == sf::Keyboard::Down)
-		if (EntityManager::GetScalesCollisionPlayer("bottom"))
+		if (!EntityManager::GetGroundCollisionFootPlayer())
 			EntityManager::GetPlayer()->m_sprite.move(sf::Vector2f(0, +2));
 	if (key == sf::Keyboard::Space && Jump == 0 && TouchGround == true)
 		Jump = 45;
