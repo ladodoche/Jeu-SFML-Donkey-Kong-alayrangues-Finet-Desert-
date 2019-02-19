@@ -13,6 +13,10 @@ public:
 	static std::shared_ptr<Entity> GetScale();
 	static bool GetGroundsCollisionPlayer();
 	static bool GetGroundCollisionFootPlayer();
+	static bool OnScaleGetGroundCollisionFootPlayer();
+	static bool GetTopScalesCollisionPlayer();
+	static bool GetBottomScalesCollisionPlayer();
+	static bool GetScalesCollisionPlayerToGoDown();
 	static bool GetScalesCollisionPlayer(std::string direction);
 };
 

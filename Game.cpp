@@ -66,7 +66,7 @@ void Game::InitSprites()
 
 	for (int i = 0; i < 3; i++) {
 		_Ground[i].setTexture(_TextureGround);
-		_Ground[i].setPosition(240.f + 68.f * i, 195.f);
+		_Ground[i].setPosition(235.f + 68.f * i, 195.f);
 		std::shared_ptr<Entity> ground = std::make_shared<Entity>();
 		ground->m_sprite = _Ground[i];
 		ground->m_type = EntityType::ground;
@@ -77,7 +77,7 @@ void Game::InitSprites()
 
 	for (int i = 0; i < 2; i++) {
 		_Ground[i].setTexture(_TextureGround);
-		_Ground[i].setPosition(58.f + 68.f * i, 195.f);
+		_Ground[i].setPosition(62.f + 68.f * i, 195.f);
 		std::shared_ptr<Entity> ground = std::make_shared<Entity>();
 		ground->m_sprite = _Ground[i];
 		ground->m_type = EntityType::ground;
@@ -181,8 +181,7 @@ void Game::update(sf::Time elapsedTime)
 			_ChangeLeftImageMario = 0;
 		}
 		_ChangeLeftImageMario++;
-
-		if (EntityManager::GetGroundCollisionFootPlayer() || Jump != 0)
+		if ((EntityManager::GetGroundCollisionFootPlayer() || Jump != 0 && (!EntityManager::GetScalesCollisionPlayer("a")) || ((EntityManager::GetTopScalesCollisionPlayer()) || EntityManager::GetBottomScalesCollisionPlayer())) || (EntityManager::GetScalesCollisionPlayer("a")) && ((EntityManager::GetTopScalesCollisionPlayer()) || EntityManager::GetBottomScalesCollisionPlayer()))
 			movement.x -= PlayerSpeed;
 	}
 	if (mIsMovingRight) {
@@ -197,12 +196,13 @@ void Game::update(sf::Time elapsedTime)
 			_ChangeRightImageMario = 0;
 		}
 		_ChangeRightImageMario++;
-
-		if (EntityManager::GetGroundCollisionFootPlayer() || Jump != 0)
+		cout << (EntityManager::GetGroundCollisionFootPlayer() && !EntityManager::GetScalesCollisionPlayer("a")) << "\n";
+		cout << (Jump != 0 && EntityManager::GetScalesCollisionPlayer("a")) << "\n";
+		cout << (EntityManager::GetTopScalesCollisionPlayer()) << "\n";
+		cout << (EntityManager::GetBottomScalesCollisionPlayer()) << "\n";
+		cout << "\n";
+		if ((EntityManager::GetGroundCollisionFootPlayer() || Jump != 0 && (!EntityManager::GetScalesCollisionPlayer("a")) || ((EntityManager::GetTopScalesCollisionPlayer()) || EntityManager::GetBottomScalesCollisionPlayer())) || (EntityManager::GetScalesCollisionPlayer("a")) && ((EntityManager::GetTopScalesCollisionPlayer()) || EntityManager::GetBottomScalesCollisionPlayer()))
 			movement.x += PlayerSpeed;
-
-		if (EntityManager::GetGroundsCollisionPlayer() && Jump > 0 && Jump < 45)
-			EntityManager::GetPlayer()->m_sprite.move(sf::Vector2f(-1, 0));
 	}
 
 	for (std::shared_ptr<Entity> entity : EntityManager::m_Entities)
@@ -231,6 +231,22 @@ void Game::render()
 		{
 			continue;
 		}
+
+		if (entity->m_type == EntityType::scale) {
+			sf::RectangleShape rectangle;
+			rectangle.setSize(sf::Vector2f(entity->m_size.x/10, entity->m_size.y));
+			rectangle.setPosition(entity->m_position.x + entity->m_size.x / 2, entity->m_position.y);
+
+			mWindow.draw(rectangle);
+		}
+
+		if (entity->m_type == EntityType::player) {
+			sf::RectangleShape rectanglePlayer;
+			rectanglePlayer.setSize(sf::Vector2f(entity ->m_size.x / 10, entity->m_size.y));
+			rectanglePlayer.setPosition(entity->m_sprite.getPosition().x + entity->m_size.x / 2, entity->m_sprite.getPosition().y);
+			mWindow.draw(rectanglePlayer);
+		}
+
 
 		mWindow.draw(entity->m_sprite);
 	}
@@ -274,7 +290,7 @@ void Game::handlePlayerInput(sf::Keyboard::Key key, bool isPressed)
 		if (EntityManager::GetScalesCollisionPlayer("top"))
 			EntityManager::GetPlayer()->m_sprite.move(sf::Vector2f(0, -2));
 	if (key == sf::Keyboard::Down)
-		if (!EntityManager::GetGroundCollisionFootPlayer())
+		if ((!EntityManager::GetGroundCollisionFootPlayer() && EntityManager::GetScalesCollisionPlayer("top")) || EntityManager::GetScalesCollisionPlayerToGoDown())
 			EntityManager::GetPlayer()->m_sprite.move(sf::Vector2f(0, +2));
 	if (key == sf::Keyboard::Space && Jump == 0 && TouchGround == true)
 		Jump = 45;
