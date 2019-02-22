@@ -30,7 +30,7 @@ std::shared_ptr<Entity> EntityManager::GetPlayer()
 	return nullptr;
 }
 
-std::shared_ptr<Entity> EntityManager::GetScale()
+std::shared_ptr<Entity> EntityManager::GetGun()
 {
 	for (std::shared_ptr<Entity> entity : EntityManager::m_Entities)
 	{
@@ -39,7 +39,7 @@ std::shared_ptr<Entity> EntityManager::GetScale()
 			continue;
 		}
 
-		if (entity->m_type == EntityType::scale)
+		if (entity->m_type == EntityType::gun)
 		{
 			return entity;
 		}
@@ -118,7 +118,7 @@ bool EntityManager::GetTopScalesCollisionPlayer()
 
 			sf::RectangleShape rectangleScale;
 			rectangleScale.setSize(sf::Vector2f(entity->m_size.x / 10, entity->m_size.y / 10));
-			rectangleScale.setPosition(entity->m_sprite.getPosition().x + entity->m_size.x / 10, entity->m_sprite.getPosition().y);
+			rectangleScale.setPosition(entity->m_sprite.getPosition().x + entity->m_size.x / 2, entity->m_sprite.getPosition().y - entity->m_size.y / 10 + 5);
 
 			sf::RectangleShape rectanglePlayer;
 			rectanglePlayer.setSize(sf::Vector2f(GetPlayer()->m_size.x, entity->m_size.y / 10));
@@ -149,7 +149,7 @@ bool EntityManager::GetBottomScalesCollisionPlayer()
 
 			sf::RectangleShape rectanglePlayer;
 			rectanglePlayer.setSize(sf::Vector2f(GetPlayer()->m_size.x, entity->m_size.y / 10));
-			rectanglePlayer.setPosition(GetPlayer()->m_sprite.getPosition().x, GetPlayer()->m_sprite.getPosition().y - GetPlayer()->m_size.y);
+			rectanglePlayer.setPosition(GetPlayer()->m_sprite.getPosition().x, GetPlayer()->m_sprite.getPosition().y - GetPlayer()->m_size.y+5);
 
 			if (rectangleScale.getGlobalBounds().intersects(rectanglePlayer.getGlobalBounds()))
 				return true;
@@ -186,7 +186,7 @@ bool EntityManager::GetScalesCollisionPlayerToGoDown()
 	return false;
 }
 
-bool EntityManager::GetScalesCollisionPlayer(std::string direction)
+bool EntityManager::GetScalesCollisionPlayer()
 {
 	for (std::shared_ptr<Entity> entity : EntityManager::m_Entities)
 	{
@@ -207,58 +207,8 @@ bool EntityManager::GetScalesCollisionPlayer(std::string direction)
 
 				if (rectangleScale.getGlobalBounds().intersects(rectanglePlayer.getGlobalBounds()))
 					return true;
-
-				/*bool collisionTop = XPositionScale - 10 <= XPositionplayer && XPositionScale >= XPositionplayer;
-
-				bool collisionBottom = (YPositionScale >= YPositionPlayerBottom + 10) && (XPositionScale - 10 <= XPositionplayer && XPositionScale >= XPositionplayer);
-				
-				bool collisionLeftAndRight = (YPositionScale >= YPositionPlayerBottom + 20 && YPositionScale <= YPositionPlayerTop - 5);
-
-				if (direction == "top")
-					if (collisionTop)
-						return true;
-
-				if (direction == "bottom")
-					if (collisionBottom)
-						return true;
-
-				if (direction == "left" || direction == "right")
-					if (collisionLeftAndRight)
-						return true;
-				*/
 			}
 		}
-
-
-		/*if (entity->m_type == EntityType::scale) {
-			if (entity->m_sprite.getGlobalBounds().intersects(GetPlayer()->m_sprite.getGlobalBounds())) {
-				double XPositionScale = entity->m_sprite.getPosition().x;
-				double YPositionScale = entity->m_sprite.getPosition().y;
-
-				double XPositionplayer = GetPlayer()->m_sprite.getPosition().x;
-				double YPositionPlayer = GetPlayer()->m_sprite.getPosition().y - GetPlayer()->m_sprite.getGlobalBounds().height;
-
-				double YPositionPlayerBottom = GetPlayer()->m_sprite.getPosition().y - GetPlayer()->m_sprite.getGlobalBounds().height;
-				double YPositionPlayerTop = GetPlayer()->m_sprite.getPosition().y + GetPlayer()->m_sprite.getGlobalBounds().height;
-
-				bool collisionTop = XPositionScale - 10 <= XPositionplayer && XPositionScale >= XPositionplayer;
-				bool collisionBottom = (YPositionScale >= YPositionPlayer + 10) && (XPositionScale - 10 <= XPositionplayer && XPositionScale >= XPositionplayer);
-				bool collisionLeftAndRight = (YPositionScale >= YPositionPlayerBottom + 20 && YPositionScale <= YPositionPlayerTop - 5);
-
-				if (direction == "top")
-					if (collisionTop)
-						return true;
-
-				if (direction == "bottom")
-					if (collisionBottom)
-						return true;
-
-				if (direction == "left" || direction == "right")
-					if (collisionLeftAndRight)
-						return true;
-			}
-		}*/
-
 	}
 
 	return false;

@@ -4,7 +4,9 @@ enum EntityType
 {
 	player,
 	ground,
-	scale
+	scale,
+	gun,
+	ammuntion
 };
 
 class Entity
@@ -20,8 +22,8 @@ public:
 	EntityType m_type;
 	bool m_enabled = true;
 
-	// Enemy only
-	bool m_bLeftToRight = true;
-	int m_times = 0;
+	// Ammuntion only
+	bool shutRight = false;
+	bool shutLeft = false;
 };
 
