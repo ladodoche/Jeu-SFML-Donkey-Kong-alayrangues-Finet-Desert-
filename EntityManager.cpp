@@ -48,6 +48,25 @@ std::shared_ptr<Entity> EntityManager::GetGun()
 	return nullptr;
 }
 
+void EntityManager::AmmunitionTouchedEnemy(std::shared_ptr<Entity> entityEnemy)
+{
+	for (std::shared_ptr<Entity> entity : EntityManager::m_Entities)
+	{
+		if (entity->m_enabled == false)
+		{
+			continue;
+		}
+
+		if (entity->m_type == EntityType::ammuntion) {
+			if (entity->m_sprite.getGlobalBounds().intersects(entityEnemy->m_sprite.getGlobalBounds()) && !entity->touch && entityEnemy->live > 0) {
+				entityEnemy->live--;
+				entity->touch = true;
+				entityEnemy->touchedEnemyDecontees = 100;
+			}
+		}
+	}
+}
+
 bool EntityManager::GetGroundsCollisionPlayer()
 {
 	for (std::shared_ptr<Entity> entity : EntityManager::m_Entities)

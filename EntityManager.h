@@ -18,5 +18,6 @@ public:
 	static bool GetBottomScalesCollisionPlayer();
 	static bool GetScalesCollisionPlayerToGoDown();
 	static bool GetScalesCollisionPlayer();
+	static void AmmunitionTouchedEnemy(std::shared_ptr<Entity> entityEnemy);
 };
 

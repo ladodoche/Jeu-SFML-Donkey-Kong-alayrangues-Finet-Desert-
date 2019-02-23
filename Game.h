@@ -3,6 +3,7 @@
 
 #define GROUND_COUNT 17
 #define SCALE_COUNT 2
+#define ENEMY_COUNT 1
 
 class Game
 {
@@ -28,6 +29,7 @@ private:
 	void HandleGameOver();
 	void DisplayGameOver();
 	bool CheckPlayerOutWindow(int x, int y);
+	void initGame();
 
 private:
 	static const float		PlayerSpeed;
@@ -67,12 +69,22 @@ private:
 	//-- Gun --//
 	sf::Sprite	_Gun;
 	sf::Texture	_TextureGun;
-	bool PlayerWithAWeapon = false;
+	bool PlayerWithAGun = false;
+
+	//-- Hammer --//
+	sf::Sprite	_Hammer;
+	sf::Texture	_TextureHammer;
+	bool PlayerWithAHammer = false;
+	int CountHammerMoving = 0;
 
 	//-- Ammuntion --//
 	std::vector<sf::Sprite>	_Ammunitions;
 	sf::Texture	_TextureAmmunition;
 	int RateOfFire = 0;
+
+	//-- Enemy --//
+	sf::Sprite	_Enemy[ENEMY_COUNT];
+	sf::Texture	_TextureEnemy;
 
 	//-- Jump --//
 	int Jump;

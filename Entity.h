@@ -6,7 +6,9 @@ enum EntityType
 	ground,
 	scale,
 	gun,
-	ammuntion
+	ammuntion,
+	enemy,
+	hammer
 };
 
 class Entity
@@ -25,5 +27,15 @@ public:
 	// Ammuntion only
 	bool shutRight = false;
 	bool shutLeft = false;
+	bool touch = false;
+	int touchedEnemyDecontees = 0;
+
+	// Enemy only
+	bool moveRight = false;
+	bool moveLeft = false;
+	int XMax;
+	int XMin;
+	int touchedPlayerDecontees = 0;
+	int live = 3;
 };
 

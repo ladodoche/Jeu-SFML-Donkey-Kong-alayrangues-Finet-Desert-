@@ -26,6 +26,8 @@ Game::Game()
 	_TextureScale.loadFromFile("Media/Textures/Echelle.png");
 	_TextureGun.loadFromFile("Media/Textures/gun.png");
 	_TextureAmmunition.loadFromFile("Media/Textures/SI_Weapon.png");
+	_TextureEnemy.loadFromFile("Media/Textures/Enemy1.png");
+	_TextureHammer.loadFromFile("Media/Textures/Hammer1.png");
 	mFont.loadFromFile("Media/Sansation.ttf");
 
 	InitSprites();
@@ -42,8 +44,6 @@ void Game::ResetSprites()
 
 void Game::InitSprites()
 {
-	_lives = 0;
-	_score = 0;
 
 	//
 	// Entites
@@ -156,6 +156,10 @@ void Game::InitEntites() {
 	scale->m_position = _Scale[1].getPosition();
 	EntityManager::m_Entities.push_back(scale);
 
+	//
+	// Gun
+	//
+
 	_Gun.setTexture(_TextureGun);
 	_Gun.setPosition(550.f, 75.f);
 	std::shared_ptr<Entity> gun = std::make_shared<Entity>();
@@ -164,6 +168,36 @@ void Game::InitEntites() {
 	gun->m_size = _TextureGun.getSize();
 	gun->m_position = _Gun.getPosition();
 	EntityManager::m_Entities.push_back(gun);
+
+	//
+	// Hammer
+	//
+
+	_Hammer.setTexture(_TextureHammer);
+	_Hammer.setPosition(120.f, 260.f);
+	std::shared_ptr<Entity> hammer = std::make_shared<Entity>();
+	hammer->m_sprite = _Hammer;
+	hammer->m_type = EntityType::hammer;
+	hammer->m_size = _TextureHammer.getSize();
+	hammer->m_position = _Hammer.getPosition();
+	EntityManager::m_Entities.push_back(hammer);
+
+	//
+	// Enemy
+	//
+
+	_Enemy[0].setTexture(_TextureEnemy);
+	_Enemy[0].setPosition(70.f, 163.f);
+	std::shared_ptr<Entity> enemy = std::make_shared<Entity>();
+	enemy->m_sprite = _Enemy[0];
+	enemy->m_type = EntityType::enemy;
+	enemy->m_size = _TextureEnemy.getSize();
+	enemy->m_position = _Enemy[0].getPosition();
+	enemy->moveRight = true;
+	enemy->moveLeft = false;
+	enemy->XMax = 390;
+	enemy->XMin = 70;
+	EntityManager::m_Entities.push_back(enemy);
 }
 
 void Game::run()
@@ -216,6 +250,8 @@ void Game::update(sf::Time elapsedTime)
 {
 	sf::Vector2f movement(0.f, 0.f);
 	if (mIsMovingLeft) {
+		if (CountHammerMoving > 0 && _ChangeRightImageMario == 1)
+			CountHammerMoving = 100;
 		_ChangeRightImageMario = 0;
 		if (_ChangeLeftImageMario <= 10) {
 			mTexture.loadFromFile("Media/Textures/Mario4.png");
@@ -234,6 +270,8 @@ void Game::update(sf::Time elapsedTime)
 			movement.x -= PlayerSpeed;
 	}
 	if (mIsMovingRight) {
+		if (CountHammerMoving > 0 && _ChangeLeftImageMario == 1)
+			CountHammerMoving = 100;
 		_ChangeLeftImageMario = 0;
 		if (_ChangeRightImageMario <= 10) {
 			mTexture.loadFromFile("Media/Textures/Mario1.png");
@@ -272,30 +310,32 @@ void Game::update(sf::Time elapsedTime)
 
 void Game::handlePlayerInput(sf::Keyboard::Key key, bool isPressed)
 {
-	if (key == sf::Keyboard::Left) {
+	if (key == sf::Keyboard::Left)
 		mIsMovingLeft = isPressed;
-	}
-	if (key == sf::Keyboard::Right) {
+
+	if (key == sf::Keyboard::Right)
 		mIsMovingRight = isPressed;
-	}
 
 	if (key == sf::Keyboard::Up)
 		if (EntityManager::GetScalesCollisionPlayer())
 			EntityManager::GetPlayer()->m_sprite.move(sf::Vector2f(0, -2));
+	
 	if (key == sf::Keyboard::Down)
 		if ((!EntityManager::GetGroundCollisionFootPlayer() && EntityManager::GetScalesCollisionPlayer()) || EntityManager::GetScalesCollisionPlayerToGoDown())
 			EntityManager::GetPlayer()->m_sprite.move(sf::Vector2f(0, +2));
+	
 	if (key == sf::Keyboard::Space && Jump == 0 && TouchGround == true)
 		Jump = 45;
+	
 	if (key == sf::Keyboard::Enter && _IsGameOver == true) {
 		mWindow.close();
 		mWindow.create(sf::VideoMode(840, 600), "Space Invaders 1978", sf::Style::Close);
 		mWindow.setFramerateLimit(160);
-		_lives = 4;
-		_IsGameOver = false;
+		initGame();
 		mText.setString("");
 	}
-	if (key == sf::Keyboard::Enter && _IsGameOver == false && PlayerWithAWeapon == true && RateOfFire == 0) {
+
+	if (key == sf::Keyboard::Enter && _IsGameOver == false && PlayerWithAGun == true && RateOfFire == 0) {
 		sf::Sprite ammuntion;
 		ammuntion.setTexture(_TextureAmmunition);
 		if (_ChangeRightImageMario > 0)
@@ -312,7 +352,7 @@ void Game::handlePlayerInput(sf::Keyboard::Key key, bool isPressed)
 		if (_ChangeRightImageMario > 0)
 			ammuntionEntity->shutRight = true;
 		EntityManager::m_Entities.push_back(ammuntionEntity);
-		RateOfFire = 20;
+		RateOfFire = 100;
 	}
 }
 
@@ -327,22 +367,119 @@ void Game::render()
 			continue;
 		}
 
-		if (entity->m_type == EntityType::player)
-			if (CheckPlayerOutWindow(EntityManager::GetPlayer()->m_sprite.getPosition().x, EntityManager::GetPlayer()->m_sprite.getPosition().y))
+		if (entity->m_type == EntityType::player) {
+			if (CheckPlayerOutWindow(EntityManager::GetPlayer()->m_sprite.getPosition().x, EntityManager::GetPlayer()->m_sprite.getPosition().y)) {
 				DisplayGameOver();
+				EntityManager::GetPlayer()->m_sprite.setPosition(sf::Vector2f(400.f, 240.f));
+			}
+		}
 
 		if (entity->m_type == EntityType::gun) {
-			if (entity->m_sprite.getGlobalBounds().intersects(EntityManager::GetPlayer()->m_sprite.getGlobalBounds()) || PlayerWithAWeapon) {
-				PlayerWithAWeapon = true;
+			if (entity->m_sprite.getGlobalBounds().intersects(EntityManager::GetPlayer()->m_sprite.getGlobalBounds()) || PlayerWithAGun) {
+				PlayerWithAGun = true;
 				continue;
 			}
 		}
 
+		if (entity->m_type == EntityType::enemy) {
+			EntityManager::AmmunitionTouchedEnemy(entity);
+
+			if (entity->live <= 0)
+				continue;
+
+			if (entity->m_sprite.getPosition().x <= entity->XMin) {
+				entity->moveRight = true;
+				entity->moveLeft = false;
+			}
+			if (entity->m_sprite.getPosition().x >= entity->XMax) {
+				entity->moveRight = false;
+				entity->moveLeft = true;
+			}
+			if(entity->moveRight)
+				entity->m_sprite.move(sf::Vector2f(0.5, 0));
+			if(entity->moveLeft)
+				entity->m_sprite.move(sf::Vector2f(-0.5, 0));
+
+			if (entity->m_sprite.getGlobalBounds().intersects(EntityManager::GetPlayer()->m_sprite.getGlobalBounds()) && entity->touchedPlayerDecontees == 0) {
+				entity->touchedPlayerDecontees = 100;
+				if (entity->moveRight == true) {
+					entity->moveRight = false;
+					entity->moveLeft = true;
+				}
+				else if (entity->moveLeft == true) {
+					entity->moveRight = true;
+					entity->moveLeft = false;
+				}
+				DisplayGameOver();
+			}
+
+			if (entity->touchedEnemyDecontees != 0) {
+				_TextureEnemy.loadFromFile("Media/Textures/Enemy2.png");
+				entity->m_sprite.setTexture(_TextureEnemy);
+			}
+			else {
+				_TextureEnemy.loadFromFile("Media/Textures/Enemy1.png");
+				entity->m_sprite.setTexture(_TextureEnemy);
+			}
+
+			if (entity->touchedEnemyDecontees != 0)
+				entity->touchedEnemyDecontees--;
+
+			if (entity->touchedPlayerDecontees != 0) 
+				entity->touchedPlayerDecontees--;
+		}
+
 		if (entity->m_type == EntityType::ammuntion) {
+			if (entity->touch == true)
+				continue;
 			if (entity->shutLeft)
 				entity->m_sprite.move(sf::Vector2f(-2, 0));
 			if (entity->shutRight)
 				entity->m_sprite.move(sf::Vector2f(2, 0));
+		}
+
+		if (entity->m_type == EntityType::hammer) {
+			if (entity->m_sprite.getGlobalBounds().intersects(EntityManager::GetPlayer()->m_sprite.getGlobalBounds()) && PlayerWithAHammer == false) {
+				cout << PlayerWithAHammer;
+				PlayerWithAHammer = true;
+				CountHammerMoving = 100;
+			}
+
+			if (CountHammerMoving > 0) {
+				if (_ChangeLeftImageMario != 0) {
+
+					entity->m_sprite.setPosition(sf::Vector2f(EntityManager::GetPlayer()->m_sprite.getPosition().x - EntityManager::GetPlayer()->m_size.x, EntityManager::GetPlayer()->m_sprite.getPosition().y + 20));
+
+					_TextureHammer.loadFromFile("Media/Textures/Hammer1.png");
+					entity->m_sprite.setOrigin(50.0f, 0.0f);
+					entity->m_sprite.move(50.0f, 0.0f);
+					entity->m_sprite.setTexture(_TextureHammer);
+
+					if (CountHammerMoving > 50)
+						entity->m_sprite.setRotation(90.f);
+					if (CountHammerMoving < 50)
+						entity->m_sprite.setRotation(0);
+					if (CountHammerMoving == 1)
+						CountHammerMoving = 100;
+				}
+				if (_ChangeRightImageMario != 0) {
+
+					entity->m_sprite.setPosition(sf::Vector2f(EntityManager::GetPlayer()->m_sprite.getPosition().x + EntityManager::GetPlayer()->m_size.x, EntityManager::GetPlayer()->m_sprite.getPosition().y + 20));
+
+					_TextureHammer.loadFromFile("Media/Textures/Hammer4.png");
+					entity->m_sprite.setOrigin(0.0f, 0.0f);
+					entity->m_sprite.move(0.0f, 0.0f);
+					entity->m_sprite.setTexture(_TextureHammer);
+
+					if (CountHammerMoving > 50)
+						entity->m_sprite.setRotation(-90.f);
+					if(CountHammerMoving < 50)
+						entity->m_sprite.setRotation(0);
+					if (CountHammerMoving == 1)
+						CountHammerMoving = 100;
+				}
+				CountHammerMoving--;
+			}
 		}
 
 		mWindow.draw(entity->m_sprite);
@@ -453,7 +590,6 @@ void Game::DisplayGameOver()
 	}
 	else if (_lives > 0) {
 		_lives--;
-		EntityManager::GetPlayer()->m_sprite.setPosition(sf::Vector2f(400.f, 240.f));
 	}
 	else
 	{
@@ -465,4 +601,27 @@ bool Game::CheckPlayerOutWindow(int x, int y) {
 	if (x < -40 || x > 880 || y < -40 || y > 640)
 		return true;
 	return false;
+}
+
+void Game::initGame() {
+	EntityManager::GetPlayer()->m_sprite.setPosition(sf::Vector2f(400.f, 240.f));
+	_lives = 3;
+	_IsGameOver = false;
+	PlayerWithAGun = false;
+	PlayerWithAHammer = false;
+	for (std::shared_ptr<Entity> entity : EntityManager::m_Entities)
+	{
+		if (entity->m_enabled == false)
+		{
+			continue;
+		}
+
+		if (entity->m_type == EntityType::enemy) {
+			entity->live = 3;
+		}
+
+		if (entity->m_type == EntityType::gun) {
+			entity->live = 3;
+		}
+	}
 }
