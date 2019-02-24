@@ -19,5 +19,9 @@ public:
 	static bool GetScalesCollisionPlayerToGoDown();
 	static bool GetScalesCollisionPlayer();
 	static void AmmunitionTouchedEnemy(std::shared_ptr<Entity> entityEnemy);
+	static void HammerTouchedEnemy(std::shared_ptr<Entity> entityEnemy);
+	static bool GetPipeCollisionPlayer();
+	static bool GetPipeCollisionFootPlayer();
+	static bool GetPipeEndCollisionFootPlayer();
 };
 

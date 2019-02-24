@@ -1,9 +1,9 @@
 #pragma once
 #include "Weapon.h"
 
-#define GROUND_COUNT 17
-#define SCALE_COUNT 2
-#define ENEMY_COUNT 1
+#define GROUND_COUNT 30
+#define SCALE_COUNT 5
+#define ENEMY_COUNT 5
 
 class Game
 {
@@ -28,8 +28,13 @@ private:
 
 	void HandleGameOver();
 	void DisplayGameOver();
+	void DisplayGameSuccess();
 	bool CheckPlayerOutWindow(int x, int y);
 	void initGame();
+
+	void game1();
+	void game2();
+	void game3();
 
 private:
 	static const float		PlayerSpeed;
@@ -44,6 +49,7 @@ private:
 	sf::Text _ScoreText;
 	int _score = 0;
 	bool _IsGameOver = false;
+	bool end = false;
 
 	std::size_t	mStatisticsNumFrames;
 	sf::Text	mStatisticsText;
@@ -56,6 +62,7 @@ private:
 	int _ChangeLeftImageMario = 0;
 	bool mIsMovingRight;
 	bool mIsMovingLeft;
+	float start = 60;
 
 	//-- Ground --//
 	sf::Sprite	_Ground[GROUND_COUNT];
@@ -86,7 +93,15 @@ private:
 	sf::Sprite	_Enemy[ENEMY_COUNT];
 	sf::Texture	_TextureEnemy;
 
+	//-- Pipe --//
+	sf::Sprite	_PipeStart;
+	sf::Sprite	_PipeEnd;
+	sf::Texture	_TexturePipe;
+
 	//-- Jump --//
 	int Jump;
+
+	//-- Game --//
+	int game = 1;
 };
 

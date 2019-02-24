@@ -8,7 +8,9 @@ enum EntityType
 	gun,
 	ammuntion,
 	enemy,
-	hammer
+	hammer,
+	pipeStart,
+	pipeEnd
 };
 
 class Entity

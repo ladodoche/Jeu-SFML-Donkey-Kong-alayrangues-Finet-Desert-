@@ -57,10 +57,29 @@ void EntityManager::AmmunitionTouchedEnemy(std::shared_ptr<Entity> entityEnemy)
 			continue;
 		}
 
-		if (entity->m_type == EntityType::ammuntion) {
-			if (entity->m_sprite.getGlobalBounds().intersects(entityEnemy->m_sprite.getGlobalBounds()) && !entity->touch && entityEnemy->live > 0) {
+		if (entity->m_type == EntityType::hammer) {
+			if (entity->m_sprite.getGlobalBounds().intersects(entityEnemy->m_sprite.getGlobalBounds()) && entityEnemy->touchedEnemyDecontees == 0 && entityEnemy->live > 0) {
+				cout << "touch";
 				entityEnemy->live--;
-				entity->touch = true;
+				entityEnemy->touchedEnemyDecontees = 100;
+			}
+		}
+	}
+}
+
+void EntityManager::HammerTouchedEnemy(std::shared_ptr<Entity> entityEnemy)
+{
+	for (std::shared_ptr<Entity> entity : EntityManager::m_Entities)
+	{
+		if (entity->m_enabled == false)
+		{
+			continue;
+		}
+
+		if (entity->m_type == EntityType::hammer) {
+			if (entity->m_sprite.getGlobalBounds().intersects(entityEnemy->m_sprite.getGlobalBounds()) && entityEnemy->touchedEnemyDecontees == 0 && entityEnemy->live > 0) {
+				cout << "touch";
+				entityEnemy->live--;
 				entityEnemy->touchedEnemyDecontees = 100;
 			}
 		}
@@ -80,6 +99,72 @@ bool EntityManager::GetGroundsCollisionPlayer()
 			if (entity->m_sprite.getGlobalBounds().intersects(GetPlayer()->m_sprite.getGlobalBounds())) {
 					return true;
 			}
+		}
+	}
+	return false;
+}
+
+bool EntityManager::GetPipeCollisionPlayer()
+{
+	for (std::shared_ptr<Entity> entity : EntityManager::m_Entities)
+	{
+		if (entity->m_enabled == false)
+		{
+			continue;
+		}
+
+		if (entity->m_type == EntityType::pipeStart || entity->m_type == EntityType::pipeEnd)
+			if (entity->m_sprite.getGlobalBounds().intersects(GetPlayer()->m_sprite.getGlobalBounds()))
+				return true;
+	}
+	return false;
+}
+
+bool EntityManager::GetPipeCollisionFootPlayer()
+{
+	for (std::shared_ptr<Entity> entity : EntityManager::m_Entities)
+	{
+		if (entity->m_enabled == false)
+		{
+			continue;
+		}
+
+		if (entity->m_type == EntityType::pipeStart || entity->m_type == EntityType::pipeEnd) {
+			sf::RectangleShape rectanglePipe;
+			rectanglePipe.setSize(sf::Vector2f(entity->m_size.x, entity->m_size.y / 7));
+			rectanglePipe.setPosition(entity->m_sprite.getPosition().x, entity->m_sprite.getPosition().y - entity->m_size.y / 7 + 10);
+
+			sf::RectangleShape rectanglePlayer;
+			rectanglePlayer.setSize(sf::Vector2f(EntityManager::GetPlayer()->m_size.x, entity->m_size.y / 10));
+			rectanglePlayer.setPosition(EntityManager::GetPlayer()->m_sprite.getPosition().x, EntityManager::GetPlayer()->m_sprite.getPosition().y + EntityManager::GetPlayer()->m_size.y);
+
+			if (rectanglePipe.getGlobalBounds().intersects(rectanglePlayer.getGlobalBounds()))
+				return true;
+		}
+	}
+	return false;
+}
+
+bool EntityManager::GetPipeEndCollisionFootPlayer()
+{
+	for (std::shared_ptr<Entity> entity : EntityManager::m_Entities)
+	{
+		if (entity->m_enabled == false)
+		{
+			continue;
+		}
+
+		if (entity->m_type == EntityType::pipeEnd) {
+			sf::RectangleShape rectanglePipe;
+			rectanglePipe.setSize(sf::Vector2f(entity->m_size.x, entity->m_size.y / 7));
+			rectanglePipe.setPosition(entity->m_sprite.getPosition().x, entity->m_sprite.getPosition().y - entity->m_size.y / 7 + 10);
+
+			sf::RectangleShape rectanglePlayer;
+			rectanglePlayer.setSize(sf::Vector2f(EntityManager::GetPlayer()->m_size.x, entity->m_size.y / 10));
+			rectanglePlayer.setPosition(EntityManager::GetPlayer()->m_sprite.getPosition().x, EntityManager::GetPlayer()->m_sprite.getPosition().y + EntityManager::GetPlayer()->m_size.y);
+
+			if (rectanglePipe.getGlobalBounds().intersects(rectanglePlayer.getGlobalBounds()))
+				return true;
 		}
 	}
 	return false;
@@ -164,11 +249,11 @@ bool EntityManager::GetBottomScalesCollisionPlayer()
 
 			sf::RectangleShape rectangleScale;
 			rectangleScale.setSize(sf::Vector2f(entity->m_size.x, entity->m_size.y / 10));
-			rectangleScale.setPosition(entity->m_sprite.getPosition().x, entity->m_sprite.getPosition().y);
+			rectangleScale.setPosition(entity->m_sprite.getPosition().x, entity->m_sprite.getPosition().y + entity->m_size.y);
 
 			sf::RectangleShape rectanglePlayer;
-			rectanglePlayer.setSize(sf::Vector2f(GetPlayer()->m_size.x, entity->m_size.y / 10));
-			rectanglePlayer.setPosition(GetPlayer()->m_sprite.getPosition().x, GetPlayer()->m_sprite.getPosition().y - GetPlayer()->m_size.y+5);
+			rectanglePlayer.setSize(sf::Vector2f(EntityManager::GetPlayer()->m_size.x, entity->m_size.y / 10));
+			rectanglePlayer.setPosition(EntityManager::GetPlayer()->m_sprite.getPosition().x, EntityManager::GetPlayer()->m_sprite.getPosition().y + EntityManager::GetPlayer()->m_size.y);
 
 			if (rectangleScale.getGlobalBounds().intersects(rectanglePlayer.getGlobalBounds()))
 				return true;
