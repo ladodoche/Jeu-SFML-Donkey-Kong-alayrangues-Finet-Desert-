@@ -73,7 +73,6 @@ void Game::InitSprites()
 }
 
 void Game::InitEntites() {
-	cout << game << "\n";
 	if (game == 1)
 		game1();
 	if (game >= 2)
@@ -249,12 +248,10 @@ void Game::handlePlayerInput(sf::Keyboard::Key key, bool isPressed)
 		Jump = 60;
 
 	if (key == sf::Keyboard::Enter && (_IsGameOver == true || end == true)) {
-		cout << "ok\n";
 		mWindow.close();
 		mWindow.create(sf::VideoMode(840, 600), "Space Invaders 1978", sf::Style::Close);
 		mWindow.setFramerateLimit(160);
 		initGame();
-		cout << "Game : " << game << "\n";
 	}
 
 	if (key == sf::Keyboard::Enter && _IsGameOver == false && PlayerWithAGun == true && RateOfFire == 0) {
@@ -310,11 +307,13 @@ void Game::render()
 			}
 
 			if (entity->m_type == EntityType::enemy) {
-				//EntityManager::AmmunitionTouchedEnemy(entity);
+				if (entity->live <= 0)
+					continue;
+
 				EntityManager::HammerTouchedEnemy(entity);
 
 				if (entity->live <= 0)
-					continue;
+					_score += 100;
 
 				if (entity->m_sprite.getPosition().x <= entity->XMin) {
 					entity->moveRight = true;
@@ -514,6 +513,7 @@ void Game::DisplayGameOver()
 	}
 	else if (_lives > 0) {
 		_lives--;
+		_score -= 100;
 	}
 	else
 	{
@@ -537,12 +537,12 @@ bool Game::CheckPlayerOutWindow(int x, int y) {
 }
 
 void Game::initGame() {
-	cout << "InitGame\n";
 	game = 1;
 	EntityManager::m_Entities.clear();
 	InitSprites();
 	EntityManager::GetPlayer()->m_sprite.setPosition(sf::Vector2f(605.f, 200.f));
 	_lives = 3;
+	_score = 0;
 	_IsGameOver = false;
 	start = 60;
 	end = false;
@@ -557,10 +557,6 @@ void Game::initGame() {
 		}
 
 		if (entity->m_type == EntityType::enemy) {
-			entity->live = 3;
-		}
-
-		if (entity->m_type == EntityType::gun) {
 			entity->live = 3;
 		}
 	}

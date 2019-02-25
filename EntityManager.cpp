@@ -59,7 +59,6 @@ void EntityManager::AmmunitionTouchedEnemy(std::shared_ptr<Entity> entityEnemy)
 
 		if (entity->m_type == EntityType::hammer) {
 			if (entity->m_sprite.getGlobalBounds().intersects(entityEnemy->m_sprite.getGlobalBounds()) && entityEnemy->touchedEnemyDecontees == 0 && entityEnemy->live > 0) {
-				cout << "touch";
 				entityEnemy->live--;
 				entityEnemy->touchedEnemyDecontees = 100;
 			}
@@ -78,7 +77,6 @@ void EntityManager::HammerTouchedEnemy(std::shared_ptr<Entity> entityEnemy)
 
 		if (entity->m_type == EntityType::hammer) {
 			if (entity->m_sprite.getGlobalBounds().intersects(entityEnemy->m_sprite.getGlobalBounds()) && entityEnemy->touchedEnemyDecontees == 0 && entityEnemy->live > 0) {
-				cout << "touch";
 				entityEnemy->live--;
 				entityEnemy->touchedEnemyDecontees = 100;
 			}
